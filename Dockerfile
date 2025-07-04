@@ -22,5 +22,3 @@ EXPOSE 8000
 # Set environment variable for Tesseract path
 ENV TESSERACT_CMD=/usr/bin/tesseract
 
-# Run the FastAPI app with Uvicorn
-CMD ["sh", "-c", "uvicorn app:app --host 0.0.0.0 --port ${PORT:-8000}"] 

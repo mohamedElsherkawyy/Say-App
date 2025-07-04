@@ -28,7 +28,7 @@ def upload_image(image_file: UploadFile = File(...)):
     return response
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8002, reload=True)
 
 
 
