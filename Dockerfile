@@ -10,7 +10,6 @@ WORKDIR /app
 
 # Copy requirements and install Python dependencies
 COPY requirements.txt ./
-RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code
@@ -21,4 +20,7 @@ EXPOSE 8000
 
 # Set environment variable for Tesseract path
 ENV TESSERACT_CMD=/usr/bin/tesseract
+
+# Run the FastAPI app with Uvicorn, always on port 8000
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
 
