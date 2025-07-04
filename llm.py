@@ -19,7 +19,7 @@ llm = ChatGroq(
 )
 
 class STTRequest(BaseModel):
-    stt_text: str 
+    stt_text: str
 
 class category(BaseModel):
     food: Optional[str] = Field(default=None)
@@ -27,18 +27,18 @@ class category(BaseModel):
     shopping: Optional[str] = Field(default=None)
     fitness: Optional[str] = Field(default=None)
     clothes: Optional[str] = Field(default=None)
-    other: Optional[str] = Field(default=None)
 
 class STTResponse(BaseModel):
     category: list[category]
 
-def process_stt(request: STTRequest):
+def process_stt(request: STTRequest ):
     prompt = f"""
 You are a specialized assistant that processes raw speech-to-text outputs and organizes them into clear, well-structured, and accurate responses.
 The text in egyptian arabic.
 The text is about what the user spent money on.
 Only return the amount of money spent on each category.
 Try to figure out the category of the text and return the category.
+Do not duplicate the list of categories.
 
 Here is the raw STT input:
 \"\"\"{request.stt_text}\"\"\"

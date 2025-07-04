@@ -4,7 +4,7 @@ import uvicorn
 from Speech_Recognition import process_audio
 from encoder import convert_to_wav
 from llm import STTRequest, process_stt
-
+from ocr import process_image_from_bytes
 app = FastAPI()
 
 @app.get("/")
@@ -18,6 +18,13 @@ def upload_audio(voice_file: UploadFile = File(...)):
     if cleanup_needed:
         os.unlink(wav_file)
         response = process_stt(STTRequest(stt_text=result))
+    return response
+
+@app.post("/image")
+def upload_image(image_file: UploadFile = File(...)):
+    image_bytes = image_file.file.read()
+    result = process_image_from_bytes(image_bytes)
+    response = process_stt(STTRequest(stt_text=result))
     return response
 
 if __name__ == "__main__":
