@@ -3,8 +3,9 @@ import pytesseract as pyt
 from pytesseract import Output
 import pandas as pd
 import numpy as np
+import os
 
-pyt.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+pyt.pytesseract.tesseract_cmd = os.getenv("TESSERACT_CMD", "/usr/bin/tesseract")
 
 def preprocess_image_from_bytes(image_bytes):
     np_arr = np.frombuffer(image_bytes, np.uint8)
