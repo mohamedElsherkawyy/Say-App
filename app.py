@@ -9,7 +9,7 @@ app = FastAPI()
 
 @app.get("/")
 def home():
-    return {"message": "Arabic Speech Recognition API"}
+    return {"message": "Say App is a voice assistant that can help you with your expenses and income"}
 
 @app.post("/audio")
 def upload_audio(voice_file: UploadFile = File(...)):

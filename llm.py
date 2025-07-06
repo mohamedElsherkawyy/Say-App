@@ -22,30 +22,33 @@ class STTRequest(BaseModel):
     stt_text: str
 
 class category(BaseModel):
-    food: Optional[str] = Field(default=None)
-    transportation: Optional[str] = Field(default=None)
-    shopping: Optional[str] = Field(default=None)
-    fitness: Optional[str] = Field(default=None)
-    clothes: Optional[str] = Field(default=None)
+    food: Optional[str] = Field(default=None, description="The amount of money spent on food , drinks , coffee shops , restaurants , etc")
+    transportation: Optional[str] = Field(default=None, description="The amount of money spent on transportation , taxi , bus , metro , etc")
+    travel: Optional[str] = Field(default=None, description="The amount of money spent on travel , hotel , airbnb , etc")
+    shopping: Optional[str] = Field(default=None, description="The amount of money spent on shopping , clothes , shoes , etc , not including food and drinks")
+    fitness: Optional[str] = Field(default=None, description="The amount of money spent on fitness , gym , yoga , etc")
+    entertainment: Optional[str] = Field(default=None, description="The amount of money spent on entertainment , movies , concerts , games , etc")
+
 
 class STTResponse(BaseModel):
     category: list[category]
 
 def process_stt(request: STTRequest ):
     prompt = f"""
-You are a specialized assistant that processes raw speech-to-text outputs and organizes them into clear, well-structured, and accurate responses.
+You are a specialized assistant that processes raw speech-to-text outputs and ocr outputs and organizes them into categories.
 The text in egyptian arabic.
 The text is about what the user spent money on.
 Only return the amount of money spent on each category.
-Try to figure out the category of the text and return the category.
-Do not duplicate the list of categories.
+Do not return the currency of the amount of money spent.
+When the user says "I spent 1000 and 5000 egyptian pounds on food" you should return the amount of money spent on food as 6000 egyptian pounds.
 
 Here is the raw STT input:
 \"\"\"{request.stt_text}\"\"\"
 Your task:
 - Use this instructions to format your response:```format_instructions```
+- Make sure to return one list of categories and not multiple lists.
+- Try to figure out the category of the text and return the category.
 """
-
     try:
         response_parser = PydanticOutputParser(pydantic_object=STTResponse)
         format_instructions = response_parser.get_format_instructions()
