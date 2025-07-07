@@ -48,6 +48,7 @@ Your task:
 - Use this instructions to format your response:```format_instructions```
 - Make sure to return one list of categories and not multiple lists.
 - Try to figure out the category of the text and return the category.
+- if the text have Subtotal and Total take Total.
 """
     try:
         response_parser = PydanticOutputParser(pydantic_object=STTResponse)
