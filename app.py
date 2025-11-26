@@ -17,7 +17,7 @@ def upload_audio(voice_file: UploadFile = File(...)):
     result = process_audio(wav_file)
     if cleanup_needed:
         os.unlink(wav_file)
-        response = process_stt(STTRequest(stt_text=result))
+    response = process_stt(STTRequest(stt_text=result))
     return response
 
 @app.post("/image")
