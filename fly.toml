@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for say-app on 2025-10-09T02:31:59+03:00
+# fly.toml app configuration file generated for say-app-model-new on 2026-01-08T02:02:01Z
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'say-app'
+app = 'say-app-model-new'
 primary_region = 'cdg'
 
 [build]
@@ -20,3 +20,4 @@ primary_region = 'cdg'
   memory = '1gb'
   cpu_kind = 'shared'
   cpus = 1
+  memory_mb = 1024
