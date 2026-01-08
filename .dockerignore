@@ -1,11 +1,10 @@
-# flyctl launch added from .gitignore
-**\.env
-**\.venv
-**\__pycache__
-**\WhatsApp.ogg
-**\converted_audio.wav
-**\WhatsAppImage.jpeg
-**\testt.py
-**\test.py
-**\regular-shopping-receipt-template.jpg
+.env
+.venv
+__pycache__
+WhatsApp.ogg
+converted_audio.wav
+WhatsAppImage.jpeg
+testt.py
+test.py
+regular-shopping-receipt-template.jpg
 fly.toml
