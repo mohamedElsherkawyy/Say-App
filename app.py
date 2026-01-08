@@ -17,7 +17,13 @@ def upload_audio(voice_file: UploadFile = File(...)):
     result = process_audio(wav_file)
     if cleanup_needed:
         os.unlink(wav_file)
-    
+    response = process_stt(STTRequest(stt_text=result))
+    return response
+
+@app.post("/image")
+def upload_image(image_file: UploadFile = File(...)):
+    image_bytes = image_file.file.read()
+    result = process_image_from_bytes(image_bytes)
     response = process_stt(STTRequest(stt_text=result))
     return response
 
