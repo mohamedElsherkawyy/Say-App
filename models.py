@@ -18,3 +18,25 @@ class STTResponse(BaseModel):
 
 class STTRequest(BaseModel):
     stt_text: str
+
+
+class Transaction(BaseModel): 
+    month: str
+    amount: float
+    category: str
+
+class ExpensesAnalysisRequest(BaseModel):
+    transactions: List[Transaction]
+
+class CategorySummary(BaseModel):
+    category: str
+    total: float
+    percent: float
+
+class ExpensesAnalysisResponse(BaseModel):
+    month: str  
+    total_spent: float
+    categories: List[CategorySummary]
+    top_categories: List[CategorySummary]
+    insights: List[str]
+    savings_tips: List[str]
