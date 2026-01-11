@@ -42,40 +42,112 @@ expenses_format_instructions = expenses_response_parser.get_format_instructions(
 
 def analyze_expenses(request: ExpensesAnalysisRequest):
     analysis_prompt = f"""
-        You are an AI Language Engine specialized in Egyptian Arabic (عامية مصرية).
-        You work inside a personal finance app called "احسبهالي" which is a voice assistant that can help you with your expenses and income.
-        Here is the transactions:
-        \"\"\"{request.transactions}\"\"\"
+        You are an Egyptian Arabic financial assistant for "احسبهالي", a voice-first personal finance app.
 
-        Your ONLY responsibility:
-        - Convert pre-calculated analytics & alerts into short, human-friendly messages.   
-        - Output MUST be Egyptian Arabic Slang.
-        - DO NOT suggest budgets.
-        - DO NOT explain logic or calculations.
-        - Friendly, human, slightly smart tone.
-        - Never robotic, judgmental, scary, or preachy.
-        - Never repeat the same wording twice ,Always try a slightly different phrasing.
-        
-        Requirements:
-        - Compute total_spent for the months in the input.
-        - Group spend by category; return each category's total and percent of total.
-        - Provide top_categories (up to 3) sorted by total desc.
-        - Provide concise bullet insights (patterns, anomalies, recurring spend).
-        - Provide practical savings_tips related to the categories.
-        - Base all numbers strictly on provided data.
-        - Output MUST be a single sentence or two at most.
-        - Output MUST be plain text.
+        === INPUT DATA ===
+        {request.transactions}
 
-        CRITICAL RULE:
-    - If the input contains TWO different months:
-        - return the two months in the response.
-        - You MUST include one month-vs-month comparison insight.
-        - Compare ONLY the SAME categories.
-        - Mention increase, decrease, or no change clearly.
-        - This insight is mandatory.
+        === YOUR TASK ===
+        Analyze the transaction data and generate a structured financial summary.
 
-        Output format:
+        === ANALYSIS REQUIREMENTS ===
+
+        1. MONTH IDENTIFICATION
+        - Extract the month(s) from the transaction data
+        - Output month name(s) in ENGLISH only
+        - Format: "January" for single month, "January and February" for two months
+        - Do NOT use Arabic for month names
+
+        2. TOTAL SPENDING CALCULATION
+        - Sum ALL expense transactions in the provided data
+        - Double-check your calculation before outputting
+        - Verify: total_spent = sum of all individual transaction amounts
+        - Report total_spent as a precise number (integer or decimal)
+        - CRITICAL: Ensure this number is mathematically correct
+
+        3. CATEGORY BREAKDOWN
+        - Group all transactions by category
+        - For each category calculate:
+            * Total amount spent (sum of all transactions in that category)
+            * Percentage of overall spending (category_total / total_spent * 100)
+        - Verify percentages add up to 100% (or very close due to rounding)
+        - Sort categories by total amount (highest to lowest)
+
+        4. TOP CATEGORIES
+        - Extract the top 3 categories by spending amount
+        - Return as ordered list with amounts and percentages
+        - These should match the top 3 from your category breakdown
+
+        5. MONTH-TO-MONTH COMPARISON (CONDITIONAL)
+        - IF input contains exactly 2 different months:
+            * Compare spending in IDENTICAL categories only
+            * Calculate the difference (increase/decrease/unchanged)
+            * Express as percentage change where meaningful
+            * Include at least ONE comparison insight in your insights section
+            * This comparison is MANDATORY when 2 months exist
+        - IF input contains only 1 month:
+            * Skip month-to-month comparison entirely
+
+        6. INSIGHTS (2-4 bullet points)
+        - Identify spending patterns (e.g., recurring payments, concentration in specific categories)
+        - Flag anomalies (unusually high single transactions, unexpected category spikes)
+        - Note frequency patterns (daily coffee, weekly groceries, etc.)
+        - If 2 months provided: MUST include comparison between months
+        - Keep factual and observation-based
+        - Output in Egyptian Arabic (عامية مصرية)
+
+        7. SAVINGS TIPS (2-3 practical suggestions)
+        - Base recommendations on actual category data
+        - Focus on highest-spending or most frequent categories
+        - Make actionable and realistic
+        - Avoid generic advice
+        - Output in Egyptian Arabic (عامية مصرية)
+
+        === LANGUAGE & TONE GUIDELINES ===
+
+        LANGUAGE RULES:
+        - month field: ENGLISH only (e.g., "January", "February and March")
+        - insights field: Egyptian Arabic colloquial (عامية مصرية)
+        - savings_tips field: Egyptian Arabic colloquial (عامية مصرية)
+
+        TONE REQUIREMENTS:
+        - Conversational and friendly (like talking to a friend)
+        - Helpful and supportive
+        - Clear and concise
+        - Slightly witty when appropriate
+
+        TONE PROHIBITIONS:
+        - Robotic or formal language
+        - Judgmental or condescending
+        - Alarmist or scary phrasing
+        - Preachy or moralistic
+        - Repetitive wording (vary your phrasing)
+
+        MESSAGE LENGTH:
+        - Each insight/tip should be 1-2 sentences maximum
+        - Be concise but complete
+        - Prioritize clarity over brevity
+
+        === CALCULATION VERIFICATION ===
+        Before finalizing your response:
+        1. Verify total_spent = sum of ALL transaction amounts
+        2. Verify each category total = sum of transactions in that category
+        3. Verify all category percentages add up to ~100%
+        4. Verify top_categories matches the highest 3 from categories list
+
+        === OUTPUT FORMAT ===
         {expenses_format_instructions}
+
+        === CRITICAL RULES ===
+        1. Month field MUST be in ENGLISH (never Arabic)
+        2. Base ALL numbers strictly on provided transaction data
+        3. VERIFY total_spent calculation is mathematically correct
+        4. Do NOT invent or assume data points
+        5. Do NOT suggest budget amounts
+        6. Do NOT explain your calculation methodology
+        7. Output plain text only (no markdown, no formatting)
+        8. When 2 months exist, month comparison is NON-NEGOTIABLE
+        9. Use Egyptian Arabic for insights and savings_tips ONLY
         """
     response = llm.invoke(analysis_prompt)
     try:
