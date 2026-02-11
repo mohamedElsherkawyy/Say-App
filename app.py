@@ -3,9 +3,9 @@ from fastapi import FastAPI, File, UploadFile
 import uvicorn
 from Speech_Recognition import process_audio
 from encoder import convert_to_wav
-from llm import STTRequest, process_stt, analyze_expenses
+from llm import STTRequest, process_stt, analyze_expenses , receipt
 from models import ExpensesAnalysisRequest
-from ocr import process_image_from_bytes
+from ocr import process_image
 app = FastAPI()
 
 @app.get("/")
@@ -23,17 +23,11 @@ def upload_audio(voice_file: UploadFile = File(...)):
 
 @app.post("/image")
 def upload_image(image_file: UploadFile = File(...)):
-    image_bytes = image_file.file.read()
-    result = process_image_from_bytes(image_bytes)
-    response = process_stt(STTRequest(stt_text=result))
+    image_path = image_file.file.read()
+    image_base64 = process_image(image_path)
+    response = receipt(image_base64)
     return response
 
-# @app.post("/image")
-# def upload_image(image_file: UploadFile = File(...)):
-#     image_bytes = image_file.file.read()
-#     result = process_image_from_bytes(image_bytes)
-#     response = process_stt(STTRequest(stt_text=result))
-#     return response
 
 @app.post("/analyze")
 def analyze(request: ExpensesAnalysisRequest):

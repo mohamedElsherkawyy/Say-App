@@ -12,7 +12,6 @@ class Category(BaseModel):
     healthCare: Optional[str] = Field(default=None, description="The amount of money spent on health care , doctor , hospital , insurance , pharmacy, etc")
     education: Optional[str] = Field(default=None, description="The amount of money spent on education , school , university , etc")
     carServices: Optional[str] = Field(default=None, description="The amount of money spent on car services , car repair , car maintenance , car cleaning , fuel, etc")
-
 class STTResponse(BaseModel):
     category: list[Category]
 
