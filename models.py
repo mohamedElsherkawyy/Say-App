@@ -33,9 +33,9 @@ class CategorySummary(BaseModel):
     percent: float
 
 class ExpensesAnalysisResponse(BaseModel):
-    month: str  
-    total_spent: float
-    categories: List[CategorySummary]
-    top_categories: List[CategorySummary]
-    insights: List[str]
-    savings_tips: List[str]
+    month: str  =Field(description="The month of the expenses")
+    total_spent: float = Field(description="The total amount of money spent on the expenses")
+    categories: List[CategorySummary] = Field(description="The categories of the expenses")
+    top_categories: List[CategorySummary] = Field(description="The top categories of the expenses")
+    insights: List[str] = Field(description="The insights of the expenses")
+    savings_tips: List[str] = Field(description="The savings tips of the expenses")
