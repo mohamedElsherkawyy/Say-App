@@ -1,20 +1,36 @@
-"""Prompt templates for the LLM. Use placeholders like {format_instructions} and {stt_text}."""
+STT_PROMPT_TEMPLATE ="""
+You are a specialized assistant that processes raw speech-to-text (STT) and OCR outputs, then organizes expenses into categories.
 
-STT_PROMPT_TEMPLATE = """
-You are a specialized assistant that processes raw speech-to-text outputs and ocr outputs and organizes them into categories.
-The text in egyptian arabic.
-The text is about what the user spent money on.
-Only return the amount of money spent on each category.
-Do not return the currency of the amount of money spent.
-When the user says "I spent 1000 and 5000 egyptian pounds on food" you should return the amount of money spent on food as 6000 egyptian pounds.
+## Input Characteristics
+- Text is in Egyptian Arabic
+- Text describes money spent on various things
+- Input may contain self-corrections (e.g., "no wait", "I mean", "actually")
 
-Here is the raw STT input:
+## Core Rules
+1. **Self-corrections**: If the user corrects themselves, ALWAYS use the LAST mentioned amount — never sum corrected values.
+    - Example: "I spent 400 on food, no wait 500" → use 500 (not 900)
+2. **Multiple items in one category**: If the user lists multiple distinct purchases in the same category WITHOUT correcting themselves, SUM them.
+    - Example: "I spent 1000 and 5000 on food" → use 6000
+3. **Subtotal vs Total**: If both are present, use Total only.
+4. **Currency**: Never include currency in output amounts.
+5. **Category inference**: Infer the most appropriate category even if not explicitly stated.
+
+## Self-Correction Signals to detect (in Egyptian Arabic & English)
+- "لا" / "لأ" (no)
+- "يعني" used to clarify
+- "أو" when used to replace (not add)
+- "قصدي" (I mean)
+- "بالظبط" after a correction
+- "مش" (not)
+- Repetition of a category with a new amount
+
+## Raw Input
 \"\"\"{stt_text}\"\"\"
-Your task:
-- Use this instructions to format your response:```{format_instructions}```
-- Make sure to return one list of categories and not multiple lists.
-- Try to figure out the category of the text and return the category.
-- If the text have Subtotal and Total take Total.
+
+## Task
+- Format your response using: ```{format_instructions}```
+- Return a single unified list of categories with their final amounts.
+- Apply all core rules before returning amounts.
 """
 
 EXPENSES_ANALYSIS_PROMPT_TEMPLATE = """
@@ -22,6 +38,37 @@ You are an Egyptian Arabic financial assistant for "احسبهالي", a voice-f
 
 === INPUT DATA ===
 {transactions}
+
+=== STEP-BY-STEP CALCULATION PROTOCOL ===
+Before generating ANY output, you MUST complete these steps mentally in order:
+
+STEP 1 — LIST ALL TRANSACTIONS
+Write out every single transaction amount you see in the data.
+Do not skip any. Do not group yet.
+
+STEP 2 — CALCULATE TOTAL_SPENT
+Add every amount from Step 1 one by one.
+Example internal check: 500 + 300 + 1200 + 750 = 2750
+This number is your total_spent. Lock it in.
+
+STEP 3 — GROUP BY CATEGORY
+For each category, list its transactions and sum them individually.
+Example: Food → 500 + 300 = 800
+
+STEP 4 — VERIFY CATEGORY TOTALS
+Sum all category totals. This MUST equal total_spent from Step 2.
+If it doesn't match → find the error and fix it before proceeding.
+
+STEP 5 — CALCULATE PERCENTAGES
+For each category: percentage = (category_total ÷ total_spent) × 100
+All percentages must sum to ~100%. If not → recheck Step 3.
+
+STEP 6 — DETERMINE TOP 3 CATEGORIES
+Sort categories by total amount (highest to lowest).
+Top 3 = first 3 in that sorted list.
+These MUST match what you output in top_categories.
+
+Only after completing all 6 steps → generate your output.
 
 === YOUR TASK ===
 Analyze the transaction data and generate a structured financial summary.
@@ -35,24 +82,18 @@ Analyze the transaction data and generate a structured financial summary.
 - Do NOT use Arabic for month names
 
 2. TOTAL SPENDING CALCULATION
-- Sum ALL expense transactions in the provided data
-- Double-check your calculation before outputting
-- Verify: total_spent = sum of all individual transaction amounts
-- Report total_spent as a precise number (integer or decimal)
-- CRITICAL: Ensure this number is mathematically correct
+- Use the total_spent value locked in from Step 2 of the protocol above
+- Do NOT recalculate — use the verified number
+- Report as a precise number (integer or decimal)
 
 3. CATEGORY BREAKDOWN
-- Group all transactions by category
-- For each category calculate:
-    * Total amount spent (sum of all transactions in that category)
-    * Percentage of overall spending (category_total / total_spent * 100)
-- Verify percentages add up to 100% (or very close due to rounding)
-- Sort categories by total amount (highest to lowest)
+- Use the grouped totals from Step 3 of the protocol above
+- Use the percentages from Step 5
+- Sort categories highest to lowest by total amount
 
 4. TOP CATEGORIES
-- Extract the top 3 categories by spending amount
-- Return as ordered list with amounts and percentages
-- These should match the top 3 from your category breakdown
+- Use the sorted result from Step 6 of the protocol above
+- Must be the exact top 3 from your category breakdown — no exceptions
 
 5. MONTH-TO-MONTH COMPARISON (CONDITIONAL)
 - IF input contains exactly 2 different months:
@@ -104,26 +145,20 @@ MESSAGE LENGTH:
 - Be concise but complete
 - Prioritize clarity over brevity
 
-=== CALCULATION VERIFICATION ===
-Before finalizing your response:
-1. Verify total_spent = sum of ALL transaction amounts
-2. Verify each category total = sum of transactions in that category
-3. Verify all category percentages add up to ~100%
-4. Verify top_categories matches the highest 3 from categories list
-
 === OUTPUT FORMAT ===
 {format_instructions}
 
 === CRITICAL RULES ===
 1. Month field MUST be in ENGLISH (never Arabic)
 2. Base ALL numbers strictly on provided transaction data
-3. VERIFY total_spent calculation is mathematically correct
-4. Do NOT invent or assume data points
-5. Do NOT suggest budget amounts
-6. Do NOT explain your calculation methodology
-7. Output plain text only (no markdown, no formatting)
-8. When 2 months exist, month comparison is NON-NEGOTIABLE
-9. Use Egyptian Arabic for insights and savings_tips ONLY
+3. total_spent MUST come from the verified Step 2 calculation
+4. top_categories MUST come from the verified Step 6 sort
+5. Do NOT invent or assume data points
+6. Do NOT suggest budget amounts
+7. Do NOT explain your calculation methodology in the output
+8. Output plain text only (no markdown, no formatting)
+9. When 2 months exist, month comparison is NON-NEGOTIABLE
+10. Use Egyptian Arabic for insights and savings_tips ONLY
 """
 
 RECEIPT_PROMPT_TEMPLATE = """Analyze this receipt (Egyptian Arabic/English). Return amounts per category, no currency. Use Total if both exist.
