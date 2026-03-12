@@ -13,7 +13,7 @@ class Category(BaseModel):
     education: Optional[str] = Field(default=None, description="The amount of money spent on education , school , university , etc")
     carServices: Optional[str] = Field(default=None, description="The amount of money spent on car services , car repair , car maintenance , car cleaning , fuel, etc")
 class STTResponse(BaseModel):
-    category: list[Category]
+    categories: Category
 
 class STTRequest(BaseModel):
     stt_text: str
