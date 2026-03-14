@@ -1,0 +1,32 @@
+name: Deploy FastAPI to EC2
+
+# Trigger the workflow only on a push to the main branch
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Connect and Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          # These are the commands GitHub will run on your EC2 server
+          script: |
+            cd /home/ec2-user/Say-App
+            
+            # Pull the latest code from GitHub
+            git pull origin main
+            
+            # Activate the virtual environment and install any new dependencies
+            source venv/bin/activate
+            pip install -r requirements.txt
+            
+            # Restart the FastAPI background service to apply the new code
+            sudo systemctl restart sayapp
