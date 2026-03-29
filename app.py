@@ -6,9 +6,12 @@ from encoder import convert_to_wav
 from llm import STTRequest, process_stt, analyze_expenses , receipt
 from models import ExpensesAnalysisRequest
 from ocr import process_image
+from langsmith import traceable
+
 app = FastAPI()
 
 @app.get("/")
+@traceable(name="home")
 def home():
     return {"message": "Say App is a voice assistant that can help you with your expenses and income newwwwww"}
 
