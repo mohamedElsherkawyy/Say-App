@@ -6,12 +6,10 @@ from encoder import convert_to_wav
 from llm import STTRequest, process_stt, analyze_expenses , receipt
 from models import ExpensesAnalysisRequest
 from ocr import process_image
-from langsmith import traceable
 
 app = FastAPI()
 
 @app.get("/")
-@traceable(name="home")
 def home():
     return {"message": "a new deployment server with the CI/CD Configuration"}
 
