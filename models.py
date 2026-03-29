@@ -4,6 +4,8 @@ from typing import List, Union, Optional
 
 class Category(BaseModel):
     food: Optional[str] = Field(default=None, description="The amount of money spent on food , drinks , coffee shops , restaurants , etc")
+    groceries: Optional[float] = Field(default=None, description="The amount of money spent on groceries , fruits , vegetables ,Supermarkets, fresh produce, household food supplies etc")
+    bills: Optional[float] = Field(default=None, description="The amount of money spent on bills , electricity , water , internet , phone , etc")
     transportation: Optional[str] = Field(default=None, description="The amount of money spent on transportation , taxi , bus , metro , etc")
     travel: Optional[str] = Field(default=None, description="The amount of money spent on travel , hotel , airbnb , etc")
     shopping: Optional[str] = Field(default=None, description="The amount of money spent on shopping , clothes , shoes , etc , not including food and drinks")
@@ -11,7 +13,8 @@ class Category(BaseModel):
     entertainment: Optional[str] = Field(default=None, description="The amount of money spent on entertainment , movies , concerts , games , etc")
     healthCare: Optional[str] = Field(default=None, description="The amount of money spent on health care , doctor , hospital , insurance , pharmacy, etc")
     education: Optional[str] = Field(default=None, description="The amount of money spent on education , school , university , etc")
-    carServices: Optional[str] = Field(default=None, description="The amount of money spent on car services , car repair , car maintenance , car cleaning , fuel, etc")
+    vehicleServices: Optional[str] = Field(default=None, description="The amount of money spent on car services , car repair , car maintenance , car cleaning , fuel, etc")
+    other: Optional[str] = Field(default=None, description="The amount of money spent on other categories , not included in the other categories")
 class STTResponse(BaseModel):
     categories: Category
 
