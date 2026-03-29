@@ -13,7 +13,7 @@ app = FastAPI()
 @app.get("/")
 @traceable(name="home")
 def home():
-    return {"message": "Say App is a voice assistant that can help you with your expenses and income newwwwww"}
+    return {"message": "a new deployment server with the CI/CD Configuration"}
 
 @app.post("/audio")
 def upload_audio(voice_file: UploadFile = File(...)):
