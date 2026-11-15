@@ -8,7 +8,7 @@ from ocr import process_image
 from prompts import STT_PROMPT_TEMPLATE, EXPENSES_ANALYSIS_PROMPT_TEMPLATE, RECEIPT_PROMPT_TEMPLATE
 
 llm = ChatGroq(
-    model="llama-3.3-70b-versatile",
+    model="openai/gpt-oss-120b",
     temperature=0,
     api_key=groq_api_key
 )
